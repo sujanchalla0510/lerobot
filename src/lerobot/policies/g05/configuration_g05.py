@@ -356,8 +356,9 @@ class G05Config(PreTrainedConfig):
         super().__post_init__()
         if self.dtype not in (torch.bfloat16, torch.float32):
             raise ValueError(f"dtype must be torch.bfloat16 or torch.float32, got {self.dtype!r}.")
-        if self.recipe is not None or self.recipe_path is not None:
-            # Import only for recipes: the datasets package requires optional extras.
+        if self.recipe_path is not None:
+            # Import only for a recipe file: the datasets package requires optional extras, and
+            # the inline recipe is parsed when the processor is built.
             from lerobot.datasets.recipe import resolve_recipe_override
 
             resolved = resolve_recipe_override(self.recipe, self.recipe_path)
