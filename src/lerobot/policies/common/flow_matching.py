@@ -145,6 +145,8 @@ def euler_integrate(
     """
     bsize = noise.shape[0]
     device = noise.device
+    if not isinstance(convention, FlowConvention):
+        raise TypeError(f"convention must be a FlowConvention, got {convention!r}")
     noise_at_one = convention is FlowConvention.NOISE_AT_ONE
 
     if time_grid is not None:
