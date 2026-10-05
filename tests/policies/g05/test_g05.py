@@ -2096,6 +2096,11 @@ def test_proprio_dropout_p_must_be_a_probability():
         G05Config(proprio_dropout_p=1.5)
 
 
+def test_dtype_must_be_bfloat16_or_float32():
+    with pytest.raises(ValueError, match="dtype"):
+        G05Config(dtype=torch.float16)
+
+
 def test_mrope_positions_are_built_on_the_host_and_returned_on_the_token_device():
     text, image, pad = G05TokenType.TEXT, G05TokenType.IMAGE, G05TokenType.PADDING
     token_types = torch.tensor([[pad, text, text, image, image, image, image, text]], dtype=torch.float32)

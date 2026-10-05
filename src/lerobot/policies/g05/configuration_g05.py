@@ -9,6 +9,8 @@ from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
+import torch
+
 from lerobot.configs.policies import PreTrainedConfig
 from lerobot.configs.types import FeatureType, NormalizationMode, PolicyFeature
 from lerobot.optim.optimizers import AdamWConfig
@@ -286,7 +288,9 @@ class G05Config(PreTrainedConfig):
     discrete_action: bool = True
     continuous_action: bool = False
     return_continuous_action: bool = False
-    model_weights_to_bf16: bool = True
+    # torch.bfloat16 runs the released mixed precision on CUDA (BF16 weights with the author's FP32
+    # islands, BF16 autocast); torch.float32 keeps every weight in FP32.
+    dtype: torch.dtype | None = torch.bfloat16
 
     policy_action_dim: int = 20
     policy_state_dim: int = 20
@@ -350,6 +354,8 @@ class G05Config(PreTrainedConfig):
     def __post_init__(self) -> None:
         """Resolve the recipe override and validate the configured fields."""
         super().__post_init__()
+        if self.dtype not in (torch.bfloat16, torch.float32):
+            raise ValueError(f"dtype must be torch.bfloat16 or torch.float32, got {self.dtype!r}.")
         if self.recipe is not None or self.recipe_path is not None:
             # Import only for recipes: the datasets package requires optional extras.
             from lerobot.datasets.recipe import resolve_recipe_override
