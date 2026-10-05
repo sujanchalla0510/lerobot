@@ -176,7 +176,7 @@ def euler_integrate(
         if time_grid is None:
             time = (1.0 + step * uniform_dt) if noise_at_one else step * uniform_dt
             dt = uniform_dt
-            time_tensor = torch.tensor(time, dtype=torch.float32, device=device).expand(bsize)
+            time_tensor = torch.full((bsize,), time, dtype=torch.float32, device=device)
         else:
             # Slice the grid rather than reading it back: `float(time_grid[step])` would
             # synchronise with the accelerator once per step.
